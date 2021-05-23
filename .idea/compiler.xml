@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="registry" />
+        <module name="test" />
+        <module name="management" />
+        <module name="author" />
+        <module name="gateway" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="author" target="11" />
+      <module name="gateway" target="11" />
+      <module name="gatewayt" target="11" />
+      <module name="management" target="11" />
+      <module name="registry" target="11" />
+      <module name="test" target="11" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="author" options="-parameters" />
+      <module name="gateway" options="-parameters" />
+      <module name="gatewayt" options="-parameters" />
+      <module name="management" options="-parameters" />
+      <module name="registry" options="-parameters" />
+      <module name="test" options="-parameters" />
+    </option>
+  </component>
+</project>
