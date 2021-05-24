@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class JwtTokenProvider {
     private final String JWT_SECRET = "ngocquang139Ptitngocquang139Ptitngocquang139Ptitngocquang139Ptit";
-    private final long JWT_EXPIRATION = 518400;
+    private final long JWT_EXPIRATION = 1728000000;
 
     public String generateToken(CustomUserDetails userDetails) {
         Date now = new Date();
