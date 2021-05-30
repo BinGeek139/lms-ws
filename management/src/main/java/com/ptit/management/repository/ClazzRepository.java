@@ -12,4 +12,6 @@ public interface ClazzRepository extends JpaRepository<Clazz, String> {
 
     @Query("SELECT c FROM Clazz c JOIN FETCH c.exams WHERE c.id = (:id)")
     Optional<Clazz> findByIdAndAndFetchExamsEagerly(String id);
+
+    List<Clazz> findByIdTeacher(String id);
 }

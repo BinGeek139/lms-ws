@@ -8,6 +8,7 @@ import com.ptit.author.controller.request.ConfirmRequest;
 import com.ptit.author.controller.request.LoginRequest;
 import com.ptit.author.controller.request.RegisterRequest;
 import com.ptit.author.controller.response.ConfirmResponse;
+import com.ptit.author.controller.response.LoginResponse;
 import com.ptit.author.controller.response.RegisterResponse;
 import com.ptit.author.entity.CustomUserDetails;
 import com.ptit.author.entity.User;
@@ -21,6 +22,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.util.Objects;
@@ -33,7 +35,8 @@ import java.util.regex.Pattern;
 public class UserController {
     @Autowired
     AuthenticationManager authenticationManager;
-
+    @Autowired
+    MinioAdapter minioAdapter;
     @PostMapping("login")
     public ResponseEntity<ResponseBodyDto> login(@Valid @RequestBody LoginRequest loginRequest){
 
@@ -44,8 +47,12 @@ public class UserController {
                             loginRequest.getPassword()
                     )
             );
-            String jwt = jwtTokenProvider.generateToken((CustomUserDetails) authentication.getPrincipal());
-            return ResponseEntity.ok(ResponseBodyDto.ofSuccess(new ConfirmResponse(jwt)));
+            String jwt ="Bearer "+ jwtTokenProvider.generateToken((CustomUserDetails) authentication.getPrincipal());
+            CustomUserDetails customUserDetails=(CustomUserDetails) authentication.getPrincipal();
+            LoginResponse loginResponse=new LoginResponse(jwt,customUserDetails.getUser().getName()
+                                        ,customUserDetails.getUser().getUrlImage(),
+                    customUserDetails.getUser().getRole().equals(Const.ROLE_HOCSINH) ?"0":"1");
+            return ResponseEntity.ok(ResponseBodyDto.ofSuccess(loginResponse));
         } catch (Exception e){
             return ResponseEntity.ok(ResponseBodyDto.ofFail("Sai tài khoản hoặc mật khẩu"));
         }
@@ -57,7 +64,7 @@ public class UserController {
     @Autowired
     MailService mailService;
     @PostMapping("register")
-    public ResponseEntity<ResponseBodyDto> register(@Valid @RequestBody RegisterRequest register) throws Exception {
+    public ResponseEntity<ResponseBodyDto> register(@Valid RegisterRequest register, MultipartFile image) throws Exception {
         String emailOrPhone=register.getEmailOrPhoneNumber().trim();
         User user1 = userRepository.findByUsername(register.getUserName()).orElse(null);
         if(user1 != null){
@@ -79,7 +86,17 @@ public class UserController {
         if(Objects.isNull(user.getPhoneNumber()) && Objects.isNull(user.getEmail()) ){
             throw new Exception("Vui lòng nhập số điện thoại hoặc email hợp lệ");
         }
+        String urlImage="";
+        if(!(Objects.isNull(image) || image.isEmpty())){
+           try {
+               urlImage=minioAdapter.uploadFile(image);
+           } catch (Exception exception){
+               throw new Exception("Ảnh không hợp lệ");
+           }
+        }
         user.setTokenReset(code);
+        user.setUrlImage(urlImage);
+        user.setName(register.getName());
         user.setUsername(register.getUserName());
         user.setPassword(new BCryptPasswordEncoder().encode(register.getPassword()));
         if(Integer.valueOf(1).equals(register.getRole())){
@@ -96,6 +113,7 @@ public class UserController {
     }
     @Autowired
     JwtTokenProvider jwtTokenProvider;
+
     @PostMapping("/confirm-code")
     public ResponseEntity<ResponseBodyDto> confirm(@Valid @RequestBody ConfirmRequest confirmRequest) throws Exception {
         User user1 = userRepository.findById(confirmRequest.getIdUser()).orElse(null);
@@ -111,7 +129,9 @@ public class UserController {
         user1.setActiveFlg(1);
         userRepository.save(user1);
         String jwt=jwtTokenProvider.generateToken(new CustomUserDetails(user1));
-        return ResponseEntity.ok(ResponseBodyDto.ofSuccess(new ConfirmResponse(jwt)));
+        LoginResponse loginResponse=new LoginResponse(jwt,user1.getName()
+                ,user1.getUrlImage(),user1.getRole().equals(Const.ROLE_HOCSINH) ?"0":"1" );
+        return ResponseEntity.ok(ResponseBodyDto.ofSuccess(loginResponse));
     }
     private String genCode(int size){
         String s="";

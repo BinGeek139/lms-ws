@@ -18,6 +18,8 @@ public class User  {
     private String id;
     @Column(name = "user_name", nullable = false)
     private String username;
+    @Column(name = "name", nullable = false)
+    private String name;
     @Column(name = "password", nullable = false)
     private String password;
     private String phoneNumber;
@@ -35,6 +37,8 @@ public class User  {
     private String tokenReset;
     @Column(name = "token_reset_expried", columnDefinition = "DATETIME")
     private Date tokenResetExpried;
+    @Column(name = "url_image")
+    private String urlImage;
 
 
 }

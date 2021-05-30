@@ -1,5 +1,13 @@
 package com.ptit.author.config;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+
+@Data
+
+@Accessors(chain = true)
 public class ResponseBodyDto {
     private String code;
     private String message;
@@ -64,7 +72,7 @@ public class ResponseBodyDto {
 //
     public static ResponseBodyDto ofFail(String message) {
         ResponseBodyDto responseData = new ResponseBodyDto();
-        responseData.setCode("");
+        responseData.setCode("1");
 //        responseData.setData(data);
         responseData.setMessage(message);
         return responseData;

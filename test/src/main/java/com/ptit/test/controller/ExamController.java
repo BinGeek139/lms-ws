@@ -104,6 +104,7 @@ public class ExamController {
     public ResponseEntity<ResponseBodyDto> submit(@RequestBody Submit submit) throws Exception {
         Optional<Result> optionalResult = resultRepository.findById(submit.getResultId());
 
+
         Map<String,Boolean> map=new HashMap<>();
         if(!optionalResult.isPresent()){
             throw new Exception("Mã Bài thi không tồn tại");

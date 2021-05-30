@@ -18,6 +18,24 @@ public class Question {
     private Level level;
     private Exam exam;
 
+    public Question() {
+    }
+
+    public Question(String name, int status) {
+        this.name = name;
+        this.status = status;
+    }
+
+    public Question(String id) {
+        this.id = id;
+    }
+
+    public Question(String name, int status, Exam exam) {
+        this.name = name;
+        this.status = status;
+        this.exam = exam;
+    }
+
     @Id
     @Column(name = "id", unique = true, nullable = false, length = 36)
     @GeneratedValue(generator = "uuid")

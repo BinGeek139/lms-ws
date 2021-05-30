@@ -18,9 +18,17 @@ public class Clazz extends Auditable{
     private Integer status;
     private List<Exam> exams;
     private List<UserClazz> userClazzes;
-
+    private String idTeacher;
     public Clazz() {
 
+    }
+
+    public String getIdTeacher() {
+        return idTeacher;
+    }
+
+    public void setIdTeacher(String idTeacher) {
+        this.idTeacher = idTeacher;
     }
 
     @Id
