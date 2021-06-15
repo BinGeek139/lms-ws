@@ -1,6 +1,12 @@
 server:
   port: 8761
-
+spring:
+  security:
+    basic:
+      enabled: true
+    user:
+      name: t4edu
+      password: t4edu2021
 eureka:
   instance:
     hostname: localhost

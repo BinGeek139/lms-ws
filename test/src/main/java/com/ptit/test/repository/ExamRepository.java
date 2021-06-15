@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface ExamRepository extends JpaRepository<Exam, String> {
     List<Exam> findByCode(String code);
+
+    List<Exam> findByClazz_Id(String idClazz);
 }

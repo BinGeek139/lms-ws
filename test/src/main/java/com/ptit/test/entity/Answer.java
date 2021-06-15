@@ -21,7 +21,7 @@ public class Answer {
     private List<ResultDetail> resultDetails;
 
     @Id
-    @Column(name = "id", unique = true, nullable = false, length = 36)
+    @Column(name = "id", unique = true, nullable = false)
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
     public String getId() {

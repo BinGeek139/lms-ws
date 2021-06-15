@@ -1,13 +1,17 @@
-package com.ptit.test.dto;
+package com.ptit.management.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
+
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class ExamDetailDto {
+@ToString
+public class ExamResponse {
     private String code;
     private String name;
     private String id;
@@ -15,4 +19,5 @@ public class ExamDetailDto {
     private Integer quantity;
     private Integer timeLimit;
     private Integer status;
+    List<QuestionResponse> questions;
 }

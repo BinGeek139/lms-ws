@@ -14,4 +14,5 @@ public class LoginResponse {
     String name;
     String urlImage;
     String role;
+    String userId;
 }

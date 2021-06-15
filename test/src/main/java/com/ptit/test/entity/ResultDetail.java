@@ -2,6 +2,8 @@ package com.ptit.test.entity;
 
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
 
@@ -15,11 +17,11 @@ public class ResultDetail {
     @GenericGenerator(name = "uuid", strategy = "uuid")
     private String id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "resultId", referencedColumnName = "id", nullable = false)
     private Result result;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "answerId", referencedColumnName = "id", nullable = false)
     private Answer answer;
 

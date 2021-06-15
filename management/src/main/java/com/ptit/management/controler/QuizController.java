@@ -8,6 +8,7 @@ import com.ptit.management.entity.Clazz;
 import com.ptit.management.entity.Exam;
 import com.ptit.management.entity.Question;
 import com.ptit.management.repository.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,9 +17,10 @@ import org.springframework.web.bind.annotation.*;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
-
+@CrossOrigin("*")
 @RequestMapping("/exam")
 @RestController
+@Slf4j
 public class QuizController {
     @Autowired
     ExamRepository examRepository;
@@ -103,6 +105,7 @@ public class QuizController {
     @Transactional
     @PostMapping("question")
     public ResponseEntity<ResponseBodyDto> createQuestion(@RequestBody ExamRequst examRequst, @RequestHeader(name = "user_id") String userId) {
+        log.info(examRequst.toString());
         Optional<Clazz> byId = clazzRepository.findById(examRequst.getClassId());
         Exam exam = new Exam();
         exam.setClazz(byId.get());
@@ -114,11 +117,16 @@ public class QuizController {
         exam.setCode(code);
         exam.setCreatedAt(new Date(System.currentTimeMillis()));
         exam = examRepository.save(exam);
-        final Exam exam1=exam;
-        var listExam = examRequst.getQuestion().stream().map(s -> {
-            return new Question(s, 1,exam1);
-        }).collect(Collectors.toList());
-        List<Question> questions = questionRepository.saveAll(listExam);
+
+      List<Question>  questions=new ArrayList<>();
+      if( examRequst.getQuestion() != null){
+          for (String s : examRequst.getQuestion()) {
+              questions.add(new Question(s, 1,exam));
+          }
+          ;
+      }
+
+       questions = questionRepository.saveAll(questions);
         AddExamDto examDto = new AddExamDto();
         examDto.setId(exam.getId());
         var ques = questions.stream().map(question -> {
@@ -176,4 +184,59 @@ public class QuizController {
     }
 
 
+    @Transactional
+    @GetMapping("/question/{idQuestion}")
+    public ResponseEntity<ResponseBodyDto> getDetail(@PathVariable("idQuestion") String idQuestion){
+        Optional<Question> byId = questionRepository.findById(idQuestion);
+        if(!byId.isPresent()){
+            return ResponseEntity.ok(ResponseBodyDto.ofFail("Câu hỏi không tồn tại"));
+        }
+        QuestionDto questionDto = genericMapper.mapToType(byId.get(), QuestionDto.class);
+        return ResponseEntity.ok(ResponseBodyDto.ofSuccess(questionDto));
+    }
+
+    @Transactional
+    @PutMapping("/question/{idQuestion}")
+    public ResponseEntity<ResponseBodyDto> updateQuestion(@PathVariable("idQuestion") String idQuestion
+    ,@RequestBody QuestionUpdateRequest question
+    ){
+        Optional<Question> byId = questionRepository.findById(idQuestion);
+        if(!byId.isPresent()){
+            return ResponseEntity.ok(ResponseBodyDto.ofFail("Câu hỏi không tồn tại"));
+        }
+        Question question1 = byId.get();
+        question1.setName(question.getName());
+        question1.setStatus(question.getStatus());
+        question1=questionRepository.save(question1);
+        QuestionDto questionDto =  genericMapper.mapToType(question1, QuestionDto.class);
+        return ResponseEntity.ok(ResponseBodyDto.ofSuccess(questionDto));
+    }
+
+    @Transactional
+    @PutMapping("/question/answer/{idAnswer}")
+    public ResponseEntity<ResponseBodyDto> updateAnswer(@PathVariable("idAnswer") String idAnswer
+            ,@RequestBody AnswerUpdateRequest answer
+    ){
+        Optional<Answer> byId = answerRepository.findById(idAnswer);
+        if(!byId.isPresent()){
+            return ResponseEntity.ok(ResponseBodyDto.ofFail("Câu trả lời không tồn tại"));
+        }
+        Answer answer1=byId.get();
+        answer1.setName(answer.getName());
+        answer1.setIsTrue(answer1.getIsTrue());
+        answer1=answerRepository.save(answer1);
+        return ResponseEntity.ok(ResponseBodyDto.ofSuccess("ok"));
+    }
+
+
+    @Transactional
+    @PutMapping("/detail/{idExam}")
+    public ResponseEntity<ResponseBodyDto> updateAnswer(@PathVariable("idExam") String idExam) throws Exception {
+        Optional<Exam> byId = examRepository.findById(idExam);
+        if(!byId.isPresent()){
+            throw new Exception("Bài thi không tồn tại");
+        }
+        return ResponseEntity.ok(ResponseBodyDto.ofSuccess(genericMapper.mapToType(byId.get(),ExamResponse.class)));
+
+    }
 }

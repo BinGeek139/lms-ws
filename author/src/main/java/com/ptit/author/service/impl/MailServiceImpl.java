@@ -22,7 +22,7 @@ public class MailServiceImpl implements MailService {
         Content contentSen = new Content("text/plain", content);
         Mail mail = new Mail(from, subject, emailTo, contentSen);
 
-        SendGrid sg = new SendGrid("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");
+        SendGrid sg = new SendGrid("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");
         Request request = new Request();
         try {
             request.setMethod(Method.POST);

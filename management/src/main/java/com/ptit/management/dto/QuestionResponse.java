@@ -1,4 +1,4 @@
-package com.ptit.test.dto;
+package com.ptit.management.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,10 +7,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class ClazzDto {
+public class QuestionResponse {
     private String id;
-    private String name;
     private String code;
-    private String description;
-    private Integer status;
+    private String name;
+    private String note;
 }

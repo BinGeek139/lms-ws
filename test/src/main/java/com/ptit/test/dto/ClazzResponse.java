@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class ClazzDto {
+public class ClazzResponse {
     private String id;
     private String name;
     private String code;

@@ -10,4 +10,5 @@ public class GatewayConfiguration {
     public AccessControlFilter accessControlFilter() {
         return new AccessControlFilter();
     }
+
 }

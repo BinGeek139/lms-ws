@@ -11,15 +11,13 @@ import java.util.Properties;
 
 @Configuration
 public class MailSenderConfig {
-
-
     @Bean
     public JavaMailSender mailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-        mailSender.setHost("smtp.sendgrid.net");
+        mailSender.setHost("smtp.gmail.com");
         mailSender.setPort(587);
-        mailSender.setUsername("apikey");
-        mailSender.setPassword("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");
+        mailSender.setUsername("ngocquangptit139@gmail.com");
+        mailSender.setPassword("646278264");
 
         Properties javaMailProperties = new Properties();
         javaMailProperties.put("mail.smtp.starttls.enable", "true");

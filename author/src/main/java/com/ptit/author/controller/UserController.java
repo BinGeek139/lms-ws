@@ -37,6 +37,15 @@ public class UserController {
     AuthenticationManager authenticationManager;
     @Autowired
     MinioAdapter minioAdapter;
+    @GetMapping("test")
+    public String test(@RequestHeader("Authorization") String au){
+        return au;
+    }
+    @GetMapping("test1")
+    public String test1(){
+        return "ok";
+    }
+
     @PostMapping("login")
     public ResponseEntity<ResponseBodyDto> login(@Valid @RequestBody LoginRequest loginRequest){
 
@@ -51,7 +60,7 @@ public class UserController {
             CustomUserDetails customUserDetails=(CustomUserDetails) authentication.getPrincipal();
             LoginResponse loginResponse=new LoginResponse(jwt,customUserDetails.getUser().getName()
                                         ,customUserDetails.getUser().getUrlImage(),
-                    customUserDetails.getUser().getRole().equals(Const.ROLE_HOCSINH) ?"0":"1");
+                    customUserDetails.getUser().getRole().equals(Const.ROLE_HOCSINH) ?"0":"1",customUserDetails.getUser().getId());
             return ResponseEntity.ok(ResponseBodyDto.ofSuccess(loginResponse));
         } catch (Exception e){
             return ResponseEntity.ok(ResponseBodyDto.ofFail("Sai tài khoản hoặc mật khẩu"));
@@ -64,7 +73,7 @@ public class UserController {
     @Autowired
     MailService mailService;
     @PostMapping("register")
-    public ResponseEntity<ResponseBodyDto> register(@Valid RegisterRequest register, MultipartFile image) throws Exception {
+    public ResponseEntity<ResponseBodyDto> register(@Valid RegisterRequest register) throws Exception {
         String emailOrPhone=register.getEmailOrPhoneNumber().trim();
         User user1 = userRepository.findByUsername(register.getUserName()).orElse(null);
         if(user1 != null){
@@ -87,24 +96,17 @@ public class UserController {
             throw new Exception("Vui lòng nhập số điện thoại hoặc email hợp lệ");
         }
         String urlImage="";
-        if(!(Objects.isNull(image) || image.isEmpty())){
-           try {
-               urlImage=minioAdapter.uploadFile(image);
-           } catch (Exception exception){
-               throw new Exception("Ảnh không hợp lệ");
-           }
-        }
         user.setTokenReset(code);
         user.setUrlImage(urlImage);
         user.setName(register.getName());
         user.setUsername(register.getUserName());
         user.setPassword(new BCryptPasswordEncoder().encode(register.getPassword()));
-        if(Integer.valueOf(1).equals(register.getRole())){
+        if("1".equals(register.getRole())){
             user.setRole(Const.ROLE_GIAOVIEN);
         }else {
             user.setRole(Const.ROLE_HOCSINH);
         }
-        user.setActiveFlg(0);
+        user.setActiveFlg(1);
         user.setIsDeleted(0);
         User save = userRepository.save(user);
         RegisterResponse registerResponse=new RegisterResponse(save.getId());
@@ -130,7 +132,8 @@ public class UserController {
         userRepository.save(user1);
         String jwt=jwtTokenProvider.generateToken(new CustomUserDetails(user1));
         LoginResponse loginResponse=new LoginResponse(jwt,user1.getName()
-                ,user1.getUrlImage(),user1.getRole().equals(Const.ROLE_HOCSINH) ?"0":"1" );
+                ,user1.getUrlImage(),user1.getRole().equals(Const.ROLE_HOCSINH) ?"0":"1" ,
+                user1.getId());
         return ResponseEntity.ok(ResponseBodyDto.ofSuccess(loginResponse));
     }
     private String genCode(int size){
